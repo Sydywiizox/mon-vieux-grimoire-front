@@ -1,4 +1,4 @@
-const API_URL = "https://mon-vieux-grimoire-6kf7.onrender.com";
+const API_URL = "https://convincing-alyson-sydywiizox-1504e52b.koyeb.app";
 export const API_ROUTES = {
   SIGN_UP: `${API_URL}/api/auth/signup`,
   SIGN_IN: `${API_URL}/api/auth/login`,
