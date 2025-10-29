@@ -1,4 +1,7 @@
-import { Star, StarHalf } from "@phosphor-icons/react";
+import {
+  StarIcon as Star,
+  StarHalfIcon as StarHalf,
+} from "@phosphor-icons/react";
 
 export default function RatingStars({
   value,

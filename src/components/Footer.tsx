@@ -1,4 +1,4 @@
-import { MapPin } from "@phosphor-icons/react";
+import { MapPinIcon as MapPin } from "@phosphor-icons/react";
 
 export default function Footer() {
   return (

@@ -1,10 +1,10 @@
 import {
-  At,
-  Eye,
-  EyeClosed,
-  Password,
-  SignIn,
-  User,
+  AtIcon as At,
+  EyeIcon as Eye,
+  EyeClosedIcon as EyeClosed,
+  PasswordIcon as Password,
+  SignInIcon as SignIn,
+  UserIcon as User,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 import {

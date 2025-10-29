@@ -1,4 +1,8 @@
-import { ArrowLeft, Pencil, Trash } from "@phosphor-icons/react";
+import {
+  ArrowLeftIcon as ArrowLeft,
+  PencilIcon as Pencil,
+  TrashIcon as Trash,
+} from "@phosphor-icons/react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { deleteBook, getBook, rateBook, type Book } from "../api/books";
@@ -20,7 +24,7 @@ export default function BookDetailPage() {
     getBook(id)
       .then((b) => {
         setBook(b);
-        const mine = b.ratings.find((r) => r.userId === userId ?? "");
+        const mine = b.ratings.find((r) => r.userId === (userId ?? ""));
         setMyRating(mine?.grade ?? null);
       })
       .catch((e) => setError(e.message))

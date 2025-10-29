@@ -1,15 +1,16 @@
 import {
-  ArrowLeft,
-  Calendar,
-  ImageSquare,
-  Pencil,
-  Tag,
+  ArrowLeftIcon as ArrowLeft,
+  CalendarIcon as Calendar,
+  ImageSquareIcon as ImageSquare,
+  PencilIcon as Pencil,
+  TagIcon as Tag,
 } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
 import { getBook, updateBook, type Book } from "../api/books";
 import { useAuth } from "../auth/AuthContext";
+import { reactSelectStyles } from "../components/selectStyles";
 import { COMMON_GENRES, type Option } from "../constants/genres";
 
 export default function EditBookPage() {
@@ -158,6 +159,8 @@ export default function EditBookPage() {
                   />
                   <div className="pl-8">
                     <CreatableSelect<Option, false>
+                      className="w-full"
+                      styles={reactSelectStyles}
                       value={genre}
                       onChange={(v) => setGenre(v)}
                       options={COMMON_GENRES}

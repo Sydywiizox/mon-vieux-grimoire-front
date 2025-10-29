@@ -1,4 +1,10 @@
-import { Books, House, Plus, SignIn, SignOut } from "@phosphor-icons/react";
+import {
+  BooksIcon as Books,
+  HouseIcon as House,
+  PlusIcon as Plus,
+  SignInIcon as SignIn,
+  SignOutIcon as SignOut,
+} from "@phosphor-icons/react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 

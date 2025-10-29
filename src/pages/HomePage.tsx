@@ -1,4 +1,4 @@
-import { Plus } from "@phosphor-icons/react";
+import { PlusIcon as Plus } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getBestRated, getBooks, type Book } from "../api/books";
