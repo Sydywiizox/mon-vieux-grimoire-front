@@ -158,7 +158,9 @@ export default function BookDetailPage() {
               <div className="grid grid-cols-2 text-sm">
                 <div className="border-r border-gray-200 p-4">
                   <p className="text-gray-700">Genre</p>
-                  <p className="font-medium text-gray-900">{book.genre}</p>
+                  <p className="font-medium text-gray-900 capitalize">
+                    {book.genre}
+                  </p>
                 </div>
                 <div className="p-4">
                   <p className="text-gray-700">Année</p>

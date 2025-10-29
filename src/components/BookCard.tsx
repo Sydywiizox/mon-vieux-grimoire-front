@@ -15,7 +15,7 @@ export default function BookCard({ book }: { book: Book }) {
       />
       <h3 className="font-medium text-gray-800">{book.title}</h3>
       <p className="text-sm text-gray-600">{book.author}</p>
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-gray-600 capitalize">
         {book.year} • {book.genre}
       </p>
       <div className="mt-1 text-lg">
