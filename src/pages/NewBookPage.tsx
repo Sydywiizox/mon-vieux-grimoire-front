@@ -34,27 +34,30 @@ export default function NewBookPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token || !file || !genre || !year) return;
+
+    if (!title) return toast.error("Veuillez entrer un titre.");
+    if (!author) return toast.error("Veuillez entrer un auteur.");
+    if (!file)
+      return toast.error("Veuillez sélectionner une image de couverture.");
+    if (!genre) return toast.error("Veuillez choisir un genre.");
+    if (!year) return toast.error("Veuillez indiquer l’année de parution.");
+    if (!token) return toast.error("Authentification requise.");
+
     setSaving(true);
     try {
       await createBook({
         token,
         file,
-        book: {
-          title,
-          author,
-          year: Number(year),
-          genre: genre.value,
-        },
+        book: { title, author, year: Number(year), genre: genre.value },
       });
       toast.success("Livre créé avec succès !");
       navigate("/");
     } catch (err) {
-      const message =
+      toast.error(
         err instanceof Error
           ? err.message
-          : "Erreur lors de la création du livre";
-      toast.error(message);
+          : "Erreur lors de la création du livre"
+      );
     } finally {
       setSaving(false);
     }
@@ -103,6 +106,7 @@ export default function NewBookPage() {
               accept="image/*"
               onChange={onFile}
               className="hidden"
+              required
             />
           </div>
           <form className="space-y-6" onSubmit={submit}>
