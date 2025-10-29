@@ -53,7 +53,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center px-4 py-12">
+    <div className="flex items-center justify-center min-h-160 px-4 py-12">
       <div className="w-full max-w-lg rounded-2xl bg-white p-10 shadow-xl">
         <div className="mb-8">
           <div className="flex rounded-lg border border-gray-200 bg-gray-50 p-1">
@@ -150,6 +150,13 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   className="w-full rounded-lg border border-gray-300 p-2.5 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-amber-400"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPwd((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                >
+                  {showPwd ? <EyeClosed size={20} /> : <Eye size={20} />}
+                </button>
               </div>
             </div>
           )}
