@@ -86,8 +86,8 @@ export default function LoginPage() {
             Accédez à votre espace personnel
           </p>
         </div>
-        <form className="space-y-6" onSubmit={submit}>
-          <div>
+        <form onSubmit={submit}>
+          <div className="mb-6">
             <label className="mb-1 block text-sm font-medium text-gray-700">
               Adresse email
             </label>
@@ -106,7 +106,7 @@ export default function LoginPage() {
               />
             </div>
           </div>
-          <div>
+          <div className="mb-6">
             <label className="mb-1 block text-sm font-medium text-gray-700">
               Mot de passe
             </label>
@@ -132,8 +132,14 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
-          {mode === "signup" && (
-            <div>
+          <div
+            className={`transition-all duration-300 overflow-hidden ${
+              mode === "signup"
+                ? "max-h-40 opacity-100 mb-6"
+                : "max-h-0 opacity-0"
+            }`}
+          >
+            <div className="mt-2">
               <label className="mb-1 block text-sm font-medium text-gray-700">
                 Confirmer le mot de passe
               </label>
@@ -144,7 +150,7 @@ export default function LoginPage() {
                 />
                 <input
                   type={showPwd ? "text" : "password"}
-                  required
+                  required={mode === "signup"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
@@ -159,7 +165,8 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
-          )}
+          </div>
+
           <div className="pt-2">
             <button
               disabled={loading}
