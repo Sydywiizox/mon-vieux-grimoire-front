@@ -4,13 +4,13 @@ import type { Option } from "../constants/genres";
 export const reactSelectStyles: StylesConfig<Option, false> = {
   control: (base, state) => ({
     ...base,
-    minHeight: 42,
-    height: 42,
+    minHeight: 46,
+    height: 46,
     borderRadius: 8, // rounded-lg
     borderColor: state.isFocused
       ? "#f59e0b" /* amber-500 */
       : "#d1d5db" /* gray-300 */,
-    boxShadow: state.isFocused ? "0 0 0 2px rgba(245, 158, 11, 0.4)" : "none", // focus:ring-amber-400
+    boxShadow: state.isFocused ? "0 0 0 2px rgba(255, 185, 0, 1)" : "none", // focus:ring-amber-400
     "&:hover": {
       borderColor: state.isFocused ? "#f59e0b" : "#d1d5db",
     },
@@ -21,7 +21,7 @@ export const reactSelectStyles: StylesConfig<Option, false> = {
   }),
   indicatorsContainer: (base) => ({
     ...base,
-    height: 42,
+    height: 46,
   }),
   input: (base) => ({
     ...base,

@@ -4,11 +4,20 @@ import {
   TrashIcon as Trash,
 } from "@phosphor-icons/react";
 import { useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { deleteBook, getBook, rateBook, type Book } from "../api/books";
+import {
+  deleteBook,
+  deleteRating,
+  getBook,
+  rateBook,
+  updateRating,
+  type Book,
+} from "../api/books";
 import { useAuth } from "../auth/AuthContext";
+import Alert from "../components/Alert";
 import RatingStars from "../components/RatingStars";
-import Spinner from "../components/Spinner";
+import { BookDetailSkeleton } from "../components/Skeleton";
 
 export default function BookDetailPage() {
   const { id = "" } = useParams();
@@ -16,6 +25,8 @@ export default function BookDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [myRating, setMyRating] = useState<number | null>(null);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [showDeleteRatingAlert, setShowDeleteRatingAlert] = useState(false);
   const navigate = useNavigate();
   const { token, userId } = useAuth();
 
@@ -27,7 +38,12 @@ export default function BookDetailPage() {
         const mine = b.ratings.find((r) => r.userId === (userId ?? ""));
         setMyRating(mine?.grade ?? null);
       })
-      .catch((e) => setError(e.message))
+      .catch((e) => {
+        const message =
+          e instanceof Error ? e.message : "Erreur lors du chargement du livre";
+        setError(message);
+        toast.error(message);
+      })
       .finally(() => setLoading(false));
   }, [id, userId]);
 
@@ -38,19 +54,82 @@ export default function BookDetailPage() {
 
   const onDelete = async () => {
     if (!token || !book) return;
-    if (!confirm("Supprimer ce livre ?")) return;
-    await deleteBook({ token, id: book._id });
-    navigate("/");
+    setShowDeleteAlert(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!token || !book) return;
+    try {
+      await deleteBook({ token, id: book._id });
+      toast.success("Livre supprimé avec succès !");
+      navigate("/");
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de la suppression du livre";
+      toast.error(message);
+    }
   };
 
   const onRate = async (grade: number) => {
     if (!token || !book) return;
-    const updated = await rateBook({ token, id: book._id, rating: grade });
-    setBook(updated);
-    setMyRating(grade);
+    try {
+      const updated = await rateBook({ token, id: book._id, rating: grade });
+      setBook(updated);
+      setMyRating(grade);
+      toast.success(`Note de ${grade}/5 enregistrée !`);
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de l'enregistrement de la note";
+      toast.error(message);
+    }
   };
 
-  if (loading) return <Spinner />;
+  const onUpdateRating = async (grade: number) => {
+    if (!token || !book) return;
+    try {
+      const updated = await updateRating({
+        token,
+        id: book._id,
+        rating: grade,
+      });
+      setBook(updated);
+      setMyRating(grade);
+      toast.success(`Note mise à jour : ${grade}/5 !`);
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de la mise à jour de la note";
+      toast.error(message);
+    }
+  };
+
+  const onDeleteRating = async () => {
+    if (!token || !book) return;
+    setShowDeleteRatingAlert(true);
+  };
+
+  const confirmDeleteRating = async () => {
+    if (!token || !book) return;
+    try {
+      const updated = await deleteRating({ token, id: book._id });
+      setBook(updated);
+      setMyRating(null);
+      toast.success("Note supprimée avec succès !");
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de la suppression de la note";
+      toast.error(message);
+    }
+  };
+
+  if (loading) return <BookDetailSkeleton />;
   if (error) return <p className="p-6 text-center text-red-600">{error}</p>;
   if (!book) return null;
 
@@ -72,24 +151,6 @@ export default function BookDetailPage() {
             />
           </div>
           <div className="flex flex-col justify-center">
-            {isOwner && (
-              <p className="mb-4 text-sm text-gray-700">
-                Vous avez publié cet ouvrage, vous pouvez le :
-                <Link
-                  to={`/books/${book._id}/edit`}
-                  className="ml-1 text-amber-600 hover:underline"
-                >
-                  modifier
-                </Link>
-                <span className="mx-1">|</span>
-                <button
-                  onClick={onDelete}
-                  className="ml-1 text-red-600 hover:underline"
-                >
-                  supprimer
-                </button>
-              </p>
-            )}
             <div className="overflow-hidden rounded-lg border border-gray-200">
               <div className="border-b border-gray-200 p-4">
                 <h2 className="font-serif text-xl text-gray-800 italic">
@@ -119,8 +180,11 @@ export default function BookDetailPage() {
                   {Array.from({ length: 5 }).map((_, i) => (
                     <button
                       key={i}
-                      onClick={() => onRate(i + 1)}
-                      disabled={!!myRating}
+                      onClick={() =>
+                        myRating === null
+                          ? onRate(i + 1)
+                          : onUpdateRating(i + 1)
+                      }
                       className={`rounded px-2 py-1 ${
                         myRating === i + 1
                           ? "bg-amber-500 text-white"
@@ -132,17 +196,23 @@ export default function BookDetailPage() {
                     </button>
                   ))}
                 </div>
-                {!myRating && token && (
-                  <p className="mt-2 text-xs text-gray-500">
-                    Vous ne pouvez noter qu'une seule fois.
-                  </p>
+
+                {myRating !== null && (
+                  <button
+                    onClick={onDeleteRating}
+                    className="mt-3 text-sm text-red-600 hover:underline"
+                  >
+                    Supprimer ma note
+                  </button>
                 )}
+
                 {!token && (
                   <p className="mt-2 text-xs text-gray-500">
                     Connectez-vous pour noter.
                   </p>
                 )}
               </div>
+
               {isOwner && (
                 <div className="flex items-center justify-end gap-3 border-t border-gray-200 p-4">
                   <Link
@@ -163,6 +233,26 @@ export default function BookDetailPage() {
           </div>
         </div>
       </div>
+      <Alert
+        open={showDeleteAlert}
+        onOpenChange={setShowDeleteAlert}
+        title="Supprimer ce livre ?"
+        message="Cette action est irréversible. Êtes-vous sûr de vouloir supprimer ce livre ?"
+        onConfirm={confirmDelete}
+        confirmLabel="Supprimer"
+        cancelLabel="Annuler"
+        confirmVariant="danger"
+      />
+      <Alert
+        open={showDeleteRatingAlert}
+        onOpenChange={setShowDeleteRatingAlert}
+        title="Supprimer votre note ?"
+        message="Voulez-vous vraiment supprimer votre note pour ce livre ?"
+        onConfirm={confirmDeleteRating}
+        confirmLabel="Supprimer"
+        cancelLabel="Annuler"
+        confirmVariant="danger"
+      />
     </div>
   );
 }

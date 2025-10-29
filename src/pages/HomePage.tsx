@@ -1,10 +1,11 @@
 import { PlusIcon as Plus } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { getBestRated, getBooks, type Book } from "../api/books";
 import BookCard from "../components/BookCard";
 import RatingStars from "../components/RatingStars";
-import Spinner from "../components/Spinner";
+import { BookCardSkeleton, TopRatedSkeleton } from "../components/Skeleton";
 
 export default function HomePage() {
   const [books, setBooks] = useState<Book[] | null>(null);
@@ -17,7 +18,14 @@ export default function HomePage() {
         setBooks(b);
         setTop(t);
       })
-      .catch((e) => setError(e.message));
+      .catch((e) => {
+        const message =
+          e instanceof Error
+            ? e.message
+            : "Erreur lors du chargement des livres";
+        setError(message);
+        toast.error(message);
+      });
   }, []);
 
   return (
@@ -42,16 +50,16 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {!books || !top ? (
-          <Spinner />
-        ) : error ? (
+        {error ? (
           <p className="text-center text-red-600">{error}</p>
         ) : (
           <>
             <div className="grid gap-10 md:grid-cols-3 lg:grid-cols-4">
-              {books.map((book) => (
-                <BookCard key={book._id} book={book} />
-              ))}
+              {!books
+                ? Array.from({ length: 8 }).map((_, i) => (
+                    <BookCardSkeleton key={i} />
+                  ))
+                : books.map((book) => <BookCard key={book._id} book={book} />)}
             </div>
 
             <section className="mt-16">
@@ -59,22 +67,26 @@ export default function HomePage() {
                 Les mieux notés
               </h3>
               <div className="grid gap-8 md:grid-cols-3">
-                {top.map((b) => (
-                  <div key={b._id} className="flex flex-col items-center">
-                    <img
-                      src={b.imageUrl}
-                      alt={b.title}
-                      className="mb-3 h-52 w-36 rounded-lg object-cover shadow"
-                    />
-                    <p className="font-medium text-gray-800">{b.title}</p>
-                    <p className="text-sm text-gray-600">
-                      {b.year} • {b.genre}
-                    </p>
-                    <div className="mt-1 text-lg text-amber-400">
-                      <RatingStars value={b.averageRating} />
-                    </div>
-                  </div>
-                ))}
+                {!top
+                  ? Array.from({ length: 3 }).map((_, i) => (
+                      <TopRatedSkeleton key={i} />
+                    ))
+                  : top.map((b) => (
+                      <div key={b._id} className="flex flex-col items-center">
+                        <img
+                          src={b.imageUrl}
+                          alt={b.title}
+                          className="mb-3 h-52 w-36 rounded-lg object-cover shadow"
+                        />
+                        <p className="font-medium text-gray-800">{b.title}</p>
+                        <p className="text-sm text-gray-600">
+                          {b.year} • {b.genre}
+                        </p>
+                        <div className="mt-1 text-lg text-amber-400">
+                          <RatingStars value={b.averageRating} />
+                        </div>
+                      </div>
+                    ))}
               </div>
             </section>
           </>

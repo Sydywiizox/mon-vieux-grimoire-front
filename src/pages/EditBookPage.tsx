@@ -6,11 +6,13 @@ import {
   TagIcon as Tag,
 } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
 import { getBook, updateBook, type Book } from "../api/books";
 import { useAuth } from "../auth/AuthContext";
 import { reactSelectStyles } from "../components/selectStyles";
+import { EditBookSkeleton } from "../components/Skeleton";
 import { COMMON_GENRES, type Option } from "../constants/genres";
 
 export default function EditBookPage() {
@@ -25,17 +27,28 @@ export default function EditBookPage() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
   const fileInput = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    getBook(id).then((b) => {
-      setBook(b);
-      setTitle(b.title);
-      setAuthor(b.author);
-      setYear(b.year);
-      setGenre({ label: b.genre, value: b.genre });
-      setPreview(b.imageUrl);
-    });
+    setLoading(true);
+    getBook(id)
+      .then((b) => {
+        setBook(b);
+        setTitle(b.title);
+        setAuthor(b.author);
+        setYear(b.year);
+        setGenre({ label: b.genre, value: b.genre });
+        setPreview(b.imageUrl);
+      })
+      .catch((err) => {
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Erreur lors du chargement du livre";
+        toast.error(message);
+      })
+      .finally(() => setLoading(false));
   }, [id]);
 
   const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,11 +73,20 @@ export default function EditBookPage() {
         },
         file,
       });
+      toast.success("Livre mis à jour avec succès !");
       navigate(`/books/${book._id}`);
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de la mise à jour du livre";
+      toast.error(message);
     } finally {
       setSaving(false);
     }
   };
+
+  if (loading) return <EditBookSkeleton />;
 
   return (
     <div className="flex items-center justify-center px-4 py-12">
@@ -132,43 +154,29 @@ export default function EditBookPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Année
+                <label className="mb-1 block text-sm font-medium text-gray-700 inline-flex items-center gap-2">
+                  <Calendar size={18} /> Année
                 </label>
-                <div className="relative">
-                  <Calendar
-                    size={18}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
-                  <input
-                    type="number"
-                    value={year}
-                    onChange={(e) => setYear(Number(e.target.value))}
-                    className="w-full rounded-lg border border-gray-300 p-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  />
-                </div>
+                <input
+                  type="number"
+                  value={year}
+                  onChange={(e) => setYear(Number(e.target.value))}
+                  className="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Genre
+                <label className="mb-1 block text-sm font-medium text-gray-700 inline-flex items-center gap-2">
+                  <Tag size={18} /> Genre
                 </label>
-                <div className="relative">
-                  <Tag
-                    size={18}
-                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
-                  <div className="pl-8">
-                    <CreatableSelect<Option, false>
-                      className="w-full"
-                      styles={reactSelectStyles}
-                      value={genre}
-                      onChange={(v) => setGenre(v)}
-                      options={COMMON_GENRES}
-                      isClearable
-                      placeholder="Choisir ou créer..."
-                    />
-                  </div>
-                </div>
+                <CreatableSelect<Option, false>
+                  className="w-full"
+                  styles={reactSelectStyles}
+                  value={genre}
+                  onChange={(v) => setGenre(v)}
+                  options={COMMON_GENRES}
+                  isClearable
+                  placeholder="Choisir ou créer..."
+                />
               </div>
             </div>
             <div>

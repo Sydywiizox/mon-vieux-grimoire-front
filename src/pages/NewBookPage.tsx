@@ -6,6 +6,7 @@ import {
   TagIcon as Tag,
 } from "@phosphor-icons/react";
 import { useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
 import { createBook } from "../api/books";
@@ -46,7 +47,14 @@ export default function NewBookPage() {
           genre: genre.value,
         },
       });
+      toast.success("Livre créé avec succès !");
       navigate("/");
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de la création du livre";
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -124,44 +132,30 @@ export default function NewBookPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Année
+                <label className="mb-1 block text-sm font-medium text-gray-700 inline-flex items-center gap-2">
+                  <Calendar size={18} /> Année
                 </label>
-                <div className="relative">
-                  <Calendar
-                    size={18}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
-                  <input
-                    required
-                    type="number"
-                    value={year}
-                    onChange={(e) => setYear(Number(e.target.value))}
-                    className="w-full rounded-lg border border-gray-300 p-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  />
-                </div>
+                <input
+                  required
+                  type="number"
+                  value={year}
+                  onChange={(e) => setYear(Number(e.target.value))}
+                  className="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Genre
+                <label className="mb-1 block text-sm font-medium text-gray-700 inline-flex items-center gap-2">
+                  <Tag size={18} /> Genre
                 </label>
-                <div className="relative">
-                  <Tag
-                    size={18}
-                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
-                  <div className="pl-8">
-                    <CreatableSelect<Option, false>
-                      className="w-full"
-                      styles={reactSelectStyles}
-                      value={genre}
-                      onChange={(v) => setGenre(v)}
-                      options={COMMON_GENRES}
-                      isClearable
-                      placeholder="Choisir ou créer..."
-                    />
-                  </div>
-                </div>
+                <CreatableSelect<Option, false>
+                  className="w-full"
+                  styles={reactSelectStyles}
+                  value={genre}
+                  onChange={(v) => setGenre(v)}
+                  options={COMMON_GENRES}
+                  isClearable
+                  placeholder="Choisir ou créer..."
+                />
               </div>
             </div>
             <div className="pt-4">

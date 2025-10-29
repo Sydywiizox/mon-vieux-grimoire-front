@@ -82,3 +82,26 @@ export async function rateBook(params: {
     authToken: params.token,
   });
 }
+
+/* --- 🆕 Nouveaux endpoints --- */
+
+// Modifier une note existante
+export async function updateRating(params: {
+  token: string;
+  id: string;
+  rating: number;
+}) {
+  return api<Book>(`/api/books/${params.id}/rating`, {
+    method: "PUT",
+    body: JSON.stringify({ rating: params.rating }),
+    authToken: params.token,
+  });
+}
+
+// Supprimer une note
+export async function deleteRating(params: { token: string; id: string }) {
+  return api<Book>(`/api/books/${params.id}/rating`, {
+    method: "DELETE",
+    authToken: params.token,
+  });
+}

@@ -7,6 +7,7 @@ import {
   UserIcon as User,
 } from "@phosphor-icons/react";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import {
   useLocation,
   useNavigate,
@@ -35,11 +36,16 @@ export default function LoginPage() {
     try {
       if (mode === "signup") {
         await signup(email, password);
+        toast.success("Inscription réussie !");
       }
       await login(email, password);
+      toast.success("Connexion réussie !");
       navigate(redirectTo, { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue");
+      const message =
+        err instanceof Error ? err.message : "Une erreur est survenue";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
