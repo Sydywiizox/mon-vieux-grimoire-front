@@ -133,7 +133,7 @@ export default function LoginPage() {
             </div>
           </div>
           <div
-            className={`transition-all duration-300 overflow-hidden ${
+            className={`transition-all duration-300 ${
               mode === "signup"
                 ? "max-h-40 opacity-100 mb-6"
                 : "max-h-0 opacity-0"
