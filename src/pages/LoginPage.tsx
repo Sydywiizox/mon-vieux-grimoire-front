@@ -4,7 +4,6 @@ import {
   EyeClosedIcon as EyeClosed,
   PasswordIcon as Password,
   SignInIcon as SignIn,
-  UserIcon as User,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -24,17 +23,20 @@ export default function LoginPage() {
   const redirectTo = location.state?.from?.pathname || "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPwd, setShowPwd] = useState(false);
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
     try {
       if (mode === "signup") {
+        if (password !== confirmPassword) {
+          toast.error("Les mots de passe ne correspondent pas.");
+          return;
+        }
         await signup(email, password);
         toast.success("Inscription réussie !");
       }
@@ -44,7 +46,6 @@ export default function LoginPage() {
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Une erreur est survenue";
-      setError(message);
       toast.error(message);
     } finally {
       setLoading(false);
@@ -54,11 +55,34 @@ export default function LoginPage() {
   return (
     <div className="flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg rounded-2xl bg-white p-10 shadow-xl">
-        <div className="mb-10 text-center">
-          <h2 className="font-serif text-3xl text-gray-800 italic">
-            {mode === "login" ? "Connexion" : "Inscription"}
-          </h2>
-          <p className="mt-2 text-sm text-gray-500">
+        <div className="mb-8">
+          <div className="flex rounded-lg border border-gray-200 bg-gray-50 p-1">
+            <button
+              type="button"
+              onClick={() => setMode("login")}
+              className={`flex-1 rounded-md px-4 py-2 text-sm font-medium ${
+                mode === "login"
+                  ? "bg-white text-gray-900 shadow"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+              aria-selected={mode === "login"}
+            >
+              Connexion
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("signup")}
+              className={`flex-1 rounded-md px-4 py-2 text-sm font-medium ${
+                mode === "signup"
+                  ? "bg-white text-gray-900 shadow"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+              aria-selected={mode === "signup"}
+            >
+              Inscription
+            </button>
+          </div>
+          <p className="mt-3 text-center text-sm text-gray-500">
             Accédez à votre espace personnel
           </p>
         </div>
@@ -108,30 +132,39 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
+          {mode === "signup" && (
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Confirmer le mot de passe
+              </label>
+              <div className="relative">
+                <Password
+                  size={20}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  type={showPwd ? "text" : "password"}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-lg border border-gray-300 p-2.5 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+              </div>
+            </div>
+          )}
+          <div className="pt-2">
             <button
               disabled={loading}
               type="submit"
-              className="w-full rounded-lg bg-amber-500 px-8 py-2.5 font-medium text-white shadow transition hover:bg-amber-600 sm:w-auto inline-flex items-center gap-2"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 px-8 py-2.5 font-medium text-white shadow transition hover:bg-amber-600"
             >
-              <SignIn size={20} />{" "}
+              <SignIn size={20} />
               {loading
                 ? "Veuillez patienter..."
                 : mode === "login"
                 ? "Se connecter"
                 : "Créer un compte et se connecter"}
-            </button>
-            <span className="text-sm font-medium text-gray-600">OU</span>
-            <button
-              type="button"
-              onClick={() =>
-                setMode((m) => (m === "login" ? "signup" : "login"))
-              }
-              className="w-full rounded-lg border border-amber-300 bg-amber-100 px-8 py-2.5 font-medium text-amber-700 transition hover:bg-amber-200 sm:w-auto inline-flex items-center gap-2"
-            >
-              <User size={20} />{" "}
-              {mode === "login" ? "S’inscrire" : "Déjà inscrit ?"}
             </button>
           </div>
         </form>

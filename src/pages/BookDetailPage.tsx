@@ -22,7 +22,6 @@ import { BookDetailSkeleton } from "../components/Skeleton";
 export default function BookDetailPage() {
   const { id = "" } = useParams();
   const [book, setBook] = useState<Book | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [myRating, setMyRating] = useState<number | null>(null);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
@@ -41,7 +40,6 @@ export default function BookDetailPage() {
       .catch((e) => {
         const message =
           e instanceof Error ? e.message : "Erreur lors du chargement du livre";
-        setError(message);
         toast.error(message);
       })
       .finally(() => setLoading(false));
@@ -130,7 +128,6 @@ export default function BookDetailPage() {
   };
 
   if (loading) return <BookDetailSkeleton />;
-  if (error) return <p className="p-6 text-center text-red-600">{error}</p>;
   if (!book) return null;
 
   return (

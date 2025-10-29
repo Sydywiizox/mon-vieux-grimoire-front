@@ -54,7 +54,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, password }),
       }
     );
-    if (!res.ok) throw new Error("Échec de l'inscription");
+
+    // Lecture sécurisée du corps JSON (peut être vide)
+    const data = await res.json().catch(() => ({}));
+    // Gestion selon le code HTTP
+    if (res.status === 400 && data?.error === "Email déjà utilisé !") {
+      throw new Error("Email déjà utilisé !");
+    }
+
+    if (!res.ok) {
+      throw new Error("Échec de l'inscription");
+    }
+
+    return data; // Optionnel si tu veux récupérer la réponse
   }, []);
 
   const logout = useCallback(() => {
