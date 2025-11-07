@@ -1,15 +1,4 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "functions": {
-    "api/ping.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
-  "crons": [
-    {
-      "path": "/api/ping",
-      "schedule": "*/14 * * * *"
-    }
-  ]
+  "outputDirectory": "dist"
 }
