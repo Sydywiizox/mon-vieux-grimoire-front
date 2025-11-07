@@ -11,12 +11,19 @@ export default function HomePage() {
   const [books, setBooks] = useState<Book[] | null>(null);
   const [top, setTop] = useState<Book[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [slowLoad, setSlowLoad] = useState(false);
 
   useEffect(() => {
+    // Déclenche un message au bout de 3 secondes si les livres ne sont pas encore chargés
+    const timer = setTimeout(() => {
+      if (!books) setSlowLoad(true);
+    }, 3000);
+
     Promise.all([getBooks(), getBestRated()])
       .then(([b, t]) => {
         setBooks(b);
         setTop(t);
+        setSlowLoad(false);
       })
       .catch((e) => {
         const message =
@@ -25,7 +32,10 @@ export default function HomePage() {
             : "Erreur lors du chargement des livres";
         setError(message);
         toast.error(message);
-      });
+      })
+      .finally(() => clearTimeout(timer));
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -54,6 +64,14 @@ export default function HomePage() {
           <p className="text-center text-red-600">{error}</p>
         ) : (
           <>
+            {/* Message d’attente long */}
+            {slowLoad && !books && (
+              <div className="mb-4 rounded-lg bg-yellow-50 border border-yellow-200 p-3 text-center text-sm text-yellow-700">
+                ⚠️ Le serveur peut prendre un peu de temps à répondre (hébergé
+                sur Render). Merci de patienter quelques secondes...
+              </div>
+            )}
+
             <div className="grid gap-10 md:grid-cols-3 lg:grid-cols-4">
               {!books
                 ? Array.from({ length: 8 }).map((_, i) => (
