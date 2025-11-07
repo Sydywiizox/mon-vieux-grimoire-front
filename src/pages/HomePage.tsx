@@ -69,8 +69,7 @@ export default function HomePage() {
               <div className="mb-4 rounded-lg bg-yellow-50 border border-yellow-200 p-3 text-center text-sm text-yellow-700">
                 ⚠️ Le serveur peut prendre un peu de temps à se lancer (hébergé
                 sur Render en version free). Merci de patienter quelques
-                secondes le temps que le serveur se lance... (50s environ le
-                temps)
+                secondes le temps que le serveur se lance... (50s environ)
               </div>
             )}
 
