@@ -1,3 +1,4 @@
+import { CircularProgress } from "@/components/CircularProgress.tsx";
 import { PlusIcon as Plus } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -5,13 +6,23 @@ import { Link } from "react-router-dom";
 import { getBestRated, getBooks, type Book } from "../api/books";
 import BookCard from "../components/BookCard";
 import RatingStars from "../components/RatingStars";
-import { BookCardSkeleton, TopRatedSkeleton } from "../components/Skeleton";
+import { TopRatedSkeleton } from "../components/Skeleton";
 
 export default function HomePage() {
   const [books, setBooks] = useState<Book[] | null>(null);
   const [top, setTop] = useState<Book[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [slowLoad, setSlowLoad] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    if (!books) {
+      const interval = setInterval(() => {
+        setProgress((p) => (p >= 100 ? 0 : p + 5));
+      }, 200);
+      return () => clearInterval(interval);
+    }
+  }, [books]);
 
   useEffect(() => {
     // Déclenche un message au bout de 3 secondes si les livres ne sont pas encore chargés
@@ -74,11 +85,21 @@ export default function HomePage() {
             )}
 
             <div className="grid gap-10 md:grid-cols-3 lg:grid-cols-4">
-              {!books
-                ? Array.from({ length: 8 }).map((_, i) => (
-                    <BookCardSkeleton key={i} />
-                  ))
-                : books.map((book) => <BookCard key={book._id} book={book} />)}
+              {!books ? (
+                <div className="col-span-full flex flex-col items-center justify-center py-20">
+                  <CircularProgress
+                    value={progress}
+                    size={100}
+                    showLabel
+                    labelClassName="text-lg font-semibold"
+                    renderLabel={() => "Chargement..."}
+                    className="stroke-amber-300/30"
+                    progressClassName="stroke-amber-500"
+                  />
+                </div>
+              ) : (
+                books.map((book) => <BookCard key={book._id} book={book} />)
+              )}
             </div>
 
             <section className="mt-16">
