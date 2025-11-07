@@ -1,4 +1,3 @@
-import { CircularProgress } from "@/components/CircularProgress.tsx";
 import { PlusIcon as Plus } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -6,23 +5,13 @@ import { Link } from "react-router-dom";
 import { getBestRated, getBooks, type Book } from "../api/books";
 import BookCard from "../components/BookCard";
 import RatingStars from "../components/RatingStars";
-import { TopRatedSkeleton } from "../components/Skeleton";
+import { BookCardSkeleton, TopRatedSkeleton } from "../components/Skeleton";
 
 export default function HomePage() {
   const [books, setBooks] = useState<Book[] | null>(null);
   const [top, setTop] = useState<Book[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [slowLoad, setSlowLoad] = useState(false);
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    if (!books) {
-      const interval = setInterval(() => {
-        setProgress((p) => (p >= 100 ? 0 : p + 5));
-      }, 500);
-      return () => clearInterval(interval);
-    }
-  }, [books]);
 
   useEffect(() => {
     // Déclenche un message au bout de 3 secondes si les livres ne sont pas encore chargés
@@ -77,30 +66,19 @@ export default function HomePage() {
           <>
             {/* Message d’attente long */}
             {slowLoad && !books && (
-              <>
-                <div className="mb-4 rounded-lg bg-yellow-50 border border-yellow-200 p-3 text-center text-sm text-yellow-700">
-                  ⚠️ Le serveur peut prendre un peu de temps à se lancer
-                  (hébergé sur Render en version free). Merci de patienter
-                  quelques secondes le temps que le serveur se lance... (30s
-                  environ)
-                </div>
-                <div className="col-span-full flex flex-col items-center justify-center py-20">
-                  <CircularProgress
-                    value={progress}
-                    size={100}
-                    showLabel
-                    labelClassName="text-lg font-semibold"
-                    renderLabel={() => progress + "%"}
-                    className="stroke-yellow-300/30"
-                    progressClassName="stroke-yellow-500"
-                  />
-                </div>
-              </>
+              <div className="mb-4 rounded-lg bg-yellow-50 border border-yellow-200 p-3 text-center text-sm text-yellow-700">
+                ⚠️ Le serveur peut prendre un peu de temps à se lancer (hébergé
+                sur Render en version free). Merci de patienter quelques
+                secondes le temps que le serveur se lance... (30s environ)
+              </div>
             )}
 
             <div className="grid gap-10 md:grid-cols-3 lg:grid-cols-4">
-              {books &&
-                books.map((book) => <BookCard key={book._id} book={book} />)}
+              {!books
+                ? Array.from({ length: 8 }).map((_, i) => (
+                    <BookCardSkeleton key={i} />
+                  ))
+                : books.map((book) => <BookCard key={book._id} book={book} />)}
             </div>
 
             <section className="mt-16">
