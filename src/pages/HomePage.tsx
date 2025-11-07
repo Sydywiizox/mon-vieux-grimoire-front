@@ -19,7 +19,7 @@ export default function HomePage() {
     if (!books) {
       const interval = setInterval(() => {
         setProgress((p) => (p >= 100 ? 0 : p + 5));
-      }, 200);
+      }, 500);
       return () => clearInterval(interval);
     }
   }, [books]);
@@ -77,29 +77,30 @@ export default function HomePage() {
           <>
             {/* Message d’attente long */}
             {slowLoad && !books && (
-              <div className="mb-4 rounded-lg bg-yellow-50 border border-yellow-200 p-3 text-center text-sm text-yellow-700">
-                ⚠️ Le serveur peut prendre un peu de temps à se lancer (hébergé
-                sur Render en version free). Merci de patienter quelques
-                secondes le temps que le serveur se lance... (30s environ)
-              </div>
-            )}
-
-            <div className="grid gap-10 md:grid-cols-3 lg:grid-cols-4">
-              {!books ? (
+              <>
+                <div className="mb-4 rounded-lg bg-yellow-50 border border-yellow-200 p-3 text-center text-sm text-yellow-700">
+                  ⚠️ Le serveur peut prendre un peu de temps à se lancer
+                  (hébergé sur Render en version free). Merci de patienter
+                  quelques secondes le temps que le serveur se lance... (30s
+                  environ)
+                </div>
                 <div className="col-span-full flex flex-col items-center justify-center py-20">
                   <CircularProgress
                     value={progress}
                     size={100}
                     showLabel
                     labelClassName="text-lg font-semibold"
-                    renderLabel={() => "Chargement..."}
-                    className="stroke-amber-300/30"
-                    progressClassName="stroke-amber-500"
+                    renderLabel={() => progress + "%"}
+                    className="stroke-yellow-300/30"
+                    progressClassName="stroke-yellow-500"
                   />
                 </div>
-              ) : (
-                books.map((book) => <BookCard key={book._id} book={book} />)
-              )}
+              </>
+            )}
+
+            <div className="grid gap-10 md:grid-cols-3 lg:grid-cols-4">
+              {books &&
+                books.map((book) => <BookCard key={book._id} book={book} />)}
             </div>
 
             <section className="mt-16">
